@@ -1,72 +1,60 @@
-# Claude Code
+# Claude Code Python (`claude_code_py`)
 
-![](https://img.shields.io/badge/Node.js-18%2B-brightgreen?style=flat-square) [![npm]](https://www.npmjs.com/package/@anthropic-ai/claude-code)
+Standalone Python implementation of Claude Code CLI coding agent built from specification.
 
-[npm]: https://img.shields.io/npm/v/@anthropic-ai/claude-code.svg?style=flat-square
+## Features
+- **Agent Loop**: Multi-turn agent loop supporting Anthropic streaming messages, tool execution, truncation/continuation (`max_tokens`), turn limits (`max_turns`), and repetition detection.
+- **Seven Core Tools**: `Bash`, `Read`, `Write`, `Edit`, `Glob`, `Grep`, `TodoWrite`.
+- **Path Safety**: Every file tool enforces strict path checks (`Path.resolve()` relative to `project_root`).
+- **Permission Modes**:
+  - `interactive`: Prompt for user approval on mutating tools (`Bash`, `Write`, `Edit`); auto-approve read-only tools (`Read`, `Glob`, `Grep`, `TodoWrite`).
+  - `yolo`: Auto-approve all tools except dangerous Bash command patterns (`rm -rf /`, `mkfs`, etc.).
+  - `plan`: Read-only plan mode; tool calls are printed but not executed.
+- **Streaming Output**: Live streaming of assistant deltas with `rich` formatting.
+- **CLI & REPL**: Run single prompts or start an interactive prompt REPL session.
 
-Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows -- all through natural language commands. Use it in your terminal, IDE, or tag @claude on Github.
+## Installation
 
-**Learn more in the [official documentation](https://code.claude.com/docs/en/overview)**.
+```bash
+pip install -e .
+```
 
-<img src="./demo.gif" />
+For development dependencies (pytest, mypy):
+```bash
+pip install -e ".[dev]"
+```
 
-## Get started
-> [!NOTE]
-> Installation via npm is deprecated. Use one of the recommended methods below.
+## Usage
 
-For more installation options, uninstall steps, and troubleshooting, see the [setup documentation](https://code.claude.com/docs/en/setup).
+Set your `ANTHROPIC_API_KEY`:
+```bash
+export ANTHROPIC_API_KEY="your-api-key"
+```
 
-1. Install Claude Code:
+### Run a single prompt
+```bash
+python claude_code_py/cli.py "Explain the structure of this project"
+```
 
-    **MacOS/Linux (Recommended):**
-    ```bash
-    curl -fsSL https://claude.ai/install.sh | bash
-    ```
+### Start interactive REPL
+```bash
+python claude_code_py/cli.py
+```
 
-    **Homebrew (MacOS/Linux):**
-    ```bash
-    brew install --cask claude-code
-    ```
+### CLI Options
+```
+--model TEXT             Model name (default: claude-sonnet-4-20250514 or $ANTHROPIC_MODEL)
+--permission-mode MODE   Permission mode: interactive, yolo, plan (default: interactive)
+--max-turns INT          Maximum turns allowed (default: 30)
+--project-root PATH      Root directory for file safety checks (default: current directory)
+--no-stream              Disable streaming mode
+--version                Print version and exit
+--help                   Show help message
+```
 
-    **Windows (Recommended):**
-    ```powershell
-    irm https://claude.ai/install.ps1 | iex
-    ```
+## Testing
 
-    **WinGet (Windows):**
-    ```powershell
-    winget install Anthropic.ClaudeCode
-    ```
-
-    **NPM (Deprecated):**
-    ```bash
-    npm install -g @anthropic-ai/claude-code
-    ```
-
-2. Navigate to your project directory and run `claude`.
-
-## Plugins
-
-This repository includes several Claude Code plugins that extend functionality with custom commands and agents. See the [plugins directory](./plugins/README.md) for detailed documentation on available plugins.
-
-## Reporting Bugs
-
-We welcome your feedback. Use the `/bug` command to report issues directly within Claude Code, or file a [GitHub issue](https://github.com/anthropics/claude-code/issues).
-
-## Connect on Discord
-
-Join the [Claude Developers Discord](https://anthropic.com/discord) to connect with other developers using Claude Code. Get help, share feedback, and discuss your projects with the community.
-
-## Data collection, usage, and retention
-
-When you use Claude Code, we collect feedback, which includes usage data (such as code acceptance or rejections), associated conversation data, and user feedback submitted via the `/bug` command.
-
-### How we use your data
-
-See our [data usage policies](https://code.claude.com/docs/en/data-usage).
-
-### Privacy safeguards
-
-We have implemented several safeguards to protect your data, including limited retention periods for sensitive information, restricted access to user session data, and clear policies against using feedback for model training.
-
-For full details, please review our [Commercial Terms of Service](https://www.anthropic.com/legal/commercial-terms) and [Privacy Policy](https://www.anthropic.com/legal/privacy).
+Run tests with `pytest`:
+```bash
+pytest
+```
